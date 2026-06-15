@@ -9,10 +9,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(ENABLE_TEST ON)
 
 add_library(osdev-libstdc STATIC
-        cstring.cpp
-        strerror.cpp
-        vsnprintf.cpp
-        cctype.cpp
+        src/cstring.cpp
+        src/strerror.cpp
+        src/vsnprintf.cpp
+        src/cctype.cpp
         posix/posix_strings.cpp
         include/libstdc/config.h
         include/libstdc/utils.h
