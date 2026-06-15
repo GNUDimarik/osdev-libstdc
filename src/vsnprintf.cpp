@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <ctype.h>
+#include <limits.h>
 #include "cstring.h"
 #include "utils.h"
 
@@ -205,7 +206,7 @@ static const char *parse_size_specifier(const char *fmt, FormatSpec &formatSpec)
 }
 
 static char *
-put_with_field_width(char *buf, const char *value, int len, FormatSpec &formatSpec, size_t size)
+put_with_field_width(char *buf, const char *value, int len, FormatSpec &formatSpec, int size)
 {
     int padding_len = formatSpec.field_width - len >= 0 ? formatSpec.field_width - len : 0;
     formatSpec.total += padding_len;
@@ -229,13 +230,13 @@ put_with_field_width(char *buf, const char *value, int len, FormatSpec &formatSp
     return buf;
 }
 
-static char *format_char(char *buf, FormatSpec &formatSpec, size_t size, va_list_wrapper &w)
+static char *format_char(char *buf, FormatSpec &formatSpec, int size, va_list_wrapper &w)
 {
     char c = va_arg(w.ap, int);
     return put_with_field_width(buf, &c, 1, formatSpec, size);
 }
 
-static char *format_string(char *buf, FormatSpec &formatSpec, size_t size, va_list_wrapper &w, const char *s = nullptr)
+static char *format_string(char *buf, FormatSpec &formatSpec, int size, va_list_wrapper &w, const char *s = nullptr)
 {
     auto str = s ? s : va_arg(w.ap, const char*);
 
@@ -243,13 +244,14 @@ static char *format_string(char *buf, FormatSpec &formatSpec, size_t size, va_li
         str = kNull;
     }
 
-    size_t max_count = size;
+    int max_count = size;
 
     if (formatSpec.precision >= 0) {
         max_count = min(formatSpec.precision, size);
     }
 
-    size_t len = strnlen(str, max_count);
+    // I'm pretty sure the length of str is < INT_MAX :-)
+    int len = static_cast<int>(strnlen(str, max_count));
     return put_with_field_width(buf, str, len, formatSpec, size);
 }
 
@@ -388,14 +390,14 @@ number_to_string(char *buf, unsigned long long number, const FormatSpec &formatS
 
     number_len = min(number_len, size);
 
-    for (size_t i = 0; i < number_len; ++i) {
+    for (int i = 0; i < number_len; ++i) {
         *buf++ = num_str[number_len - i - 1];
     }
 
     return number_len;
 }
 
-static char *format_number(char *buf, unsigned long long number, FormatSpec &formatSpec, size_t size)
+static char *format_number(char *buf, unsigned long long number, FormatSpec &formatSpec, int size)
 {
     char sign = formatSpec.negative ? '-' : 0;
     int number_len = 0;
@@ -433,7 +435,7 @@ static char *format_number(char *buf, unsigned long long number, FormatSpec &for
     return put_with_field_width(buf, number_str, number_len, formatSpec, size);
 }
 
-static char *read_format_unsigned_int(char *buf, FormatSpec &formatSpec, size_t size, va_list_wrapper &w)
+static char *read_format_unsigned_int(char *buf, FormatSpec &formatSpec, int size, va_list_wrapper &w)
 {
     formatSpec.flags &= ~FormatFlags::F_SPACE;
     formatSpec.flags &= ~FormatFlags::F_PLUS;
@@ -451,12 +453,12 @@ int vsnprintf(char *buf, size_t max_size, const char *fmt, va_list ap)
     va_list_wrapper wrapper{};
     va_copy(wrapper.ap, ap);
 
-    if (max_size > 0) {
+    if (max_size > 0 && max_size < static_cast<size_t>(INT_MAX)) {
         char *pos = buf;
-        size_t size = max_size > 0 ? max_size - 1 : max_size;
+        int size = static_cast<int>(max_size > 0 ? max_size - 1 : max_size);
         ptrdiff_t written = 0;
         // %[flags][field_width][.precision][size specifier]specifier
-        for (size_t i = 0; *fmt && written < size; ++i, ++fmt) {
+        for (int i = 0; *fmt && written < size; ++i, ++fmt) {
             formatSpec.reset();
 
             if (*fmt != '%') {
