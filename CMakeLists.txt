@@ -2,8 +2,6 @@ cmake_minimum_required(VERSION 3.23)
 
 project(osdev-libstdc LANGUAGES C CXX)
 
-set(ARCH "x86" CACHE STRING "Target architecture")
-
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(ENABLE_TEST ON)
@@ -23,6 +21,7 @@ add_library(osdev-libstdc STATIC
         include/libstdc/printf.h
         include/posix/posix_strings.h
         include/arch/x86/asm/cpu.h
+        include/arch/x86/asm/barrier.h
 )
 
 target_include_directories(osdev-libstdc
@@ -43,13 +42,21 @@ target_compile_options(osdev-libstdc
 )
 
 if (DEFINED OSDEV_FREESTANDING)
-    message("OSDEV_FREESTANDING")
+    target_include_directories(osdev-libstdc
+            PUBLIC
+            "${PROJECT_SOURCE_DIR}/include/"
+            "${PROJECT_SOURCE_DIR}/include/libstdc"
+            "${PROJECT_SOURCE_DIR}/include/posix"
+            "${PROJECT_SOURCE_DIR}/include/arch/${ARCH}")
+
     target_compile_definitions(osdev-libstdc
             PUBLIC
             __OSDEV_FREESTANDING=1
             __OSDEV_HAVE_ERRNO_H__=1
             __OSDEV_HAVE_STRING_H__=1
             __OSDEV_HAVE_CONFIG_H__=1
+            __OSDEV_DUX_LIBSTDC__
+            __POSIX_STRINGS_MACRO__
     )
 
     target_compile_options(osdev-libstdc
