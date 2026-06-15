@@ -13,6 +13,9 @@ add_library(osdev-libstdc STATIC
         src/strerror.cpp
         src/vsnprintf.cpp
         src/cctype.cpp
+        malloc/memory.cpp
+        malloc/memory.h
+        malloc/logging.h
         posix/posix_strings.cpp
         include/libstdc/config.h
         include/libstdc/utils.h
@@ -44,6 +47,9 @@ if (DEFINED OSDEV_FREESTANDING)
     target_compile_definitions(osdev-libstdc
             PUBLIC
             __OSDEV_FREESTANDING=1
+            __OSDEV_HAVE_ERRNO_H__=1
+            __OSDEV_HAVE_STRING_H__=1
+            __OSDEV_HAVE_CONFIG_H__=1
     )
 
     target_compile_options(osdev-libstdc
@@ -89,6 +95,7 @@ if (DEFINED ENABLE_TEST AND NOT DEFINED OSDEV_FREESTANDING)
             tests/cstring_test.cpp
             tests/vsnprintf_test.cpp
             tests/ctype_test.cpp
+            malloc/allocator_test.cpp
     )
 
     target_link_libraries(osdev_libstdc_test
