@@ -23,6 +23,7 @@
  */
 
 #include <stddef.h>
+#include <stdint.h>
 #include <stdarg.h>
 #include <ctype.h>
 #include "cstring.h"
@@ -81,6 +82,11 @@ struct FormatSpec
     }
 };
 
+struct va_list_wrapper
+{
+    va_list ap;
+};
+
 static const char *parse_number(const char *str, int &out)
 {
     int v = 0;
@@ -92,7 +98,7 @@ static const char *parse_number(const char *str, int &out)
     return str;
 }
 
-static const char *parse_flags_fw_precision(const char *fmt, FormatSpec &formatSpec, va_list &ap)
+static const char *parse_flags_fw_precision(const char *fmt, FormatSpec &formatSpec, va_list_wrapper &w)
 {
     do {
         switch (*fmt) {
@@ -126,7 +132,7 @@ static const char *parse_flags_fw_precision(const char *fmt, FormatSpec &formatS
 
     if (*fmt == '*') {
         ++fmt;
-        formatSpec.field_width = va_arg(ap, int);
+        formatSpec.field_width = va_arg(w.ap, int);
     }
     else if (isdigit(*fmt)) {
         fmt = parse_number(fmt, formatSpec.field_width);
@@ -147,7 +153,7 @@ static const char *parse_flags_fw_precision(const char *fmt, FormatSpec &formatS
         ++fmt;
         if (*fmt == '*') {
             ++fmt;
-            formatSpec.precision = va_arg(ap, int);
+            formatSpec.precision = va_arg(w.ap, int);
         }
         else if (*fmt == '-') {
             while (isdigit(*++fmt)) {}
@@ -223,15 +229,15 @@ put_with_field_width(char *buf, const char *value, int len, FormatSpec &formatSp
     return buf;
 }
 
-static char *format_char(char *buf, FormatSpec &formatSpec, size_t size, va_list &ap)
+static char *format_char(char *buf, FormatSpec &formatSpec, size_t size, va_list_wrapper &w)
 {
-    char c = va_arg(ap, int);
+    char c = va_arg(w.ap, int);
     return put_with_field_width(buf, &c, 1, formatSpec, size);
 }
 
-static char *format_string(char *buf, FormatSpec &formatSpec, size_t size, va_list &ap, const char *s = nullptr)
+static char *format_string(char *buf, FormatSpec &formatSpec, size_t size, va_list_wrapper &w, const char *s = nullptr)
 {
-    auto str = s ? s : va_arg(ap, const char*);
+    auto str = s ? s : va_arg(w.ap, const char*);
 
     if (!str) {
         str = kNull;
@@ -247,68 +253,68 @@ static char *format_string(char *buf, FormatSpec &formatSpec, size_t size, va_li
     return put_with_field_width(buf, str, len, formatSpec, size);
 }
 
-static long long read_signed_number(const FormatSpec &formatSpec, va_list &ap)
+static long long read_signed_number(const FormatSpec &formatSpec, va_list_wrapper &w)
 {
     long long value = 0;
 
     switch (formatSpec.lengthSpec) {
         case LengthSpec::l:
-            value = va_arg(ap, long);
+            value = va_arg(w.ap, long);
             break;
 
         case LengthSpec::z:
-            value = static_cast<ssize_t> (va_arg(ap, ssize_t));
+            value = static_cast<int64_t> (va_arg(w.ap, int64_t));
             break;
 
         case LengthSpec::hh: {
-            char v = va_arg(ap, int);
+            char v = va_arg(w.ap, int);
             value = v;
         }
             break;
 
         case LengthSpec::h:
-            value = va_arg(ap, int);
+            value = va_arg(w.ap, int);
             break;
 
         case LengthSpec::t:
-            value = va_arg(ap, ptrdiff_t);
+            value = va_arg(w.ap, ptrdiff_t);
             break;
 
         case LengthSpec::ll:
         default:
-            value = va_arg(ap, long long);
+            value = va_arg(w.ap, long long);
             break;
     }
 
     return value;
 }
 
-static unsigned long long read_unsigned_number(const FormatSpec &formatSpec, va_list &ap)
+static unsigned long long read_unsigned_number(const FormatSpec &formatSpec, va_list_wrapper &w)
 {
     unsigned long long value = 0;
 
     switch (formatSpec.lengthSpec) {
         case LengthSpec::l:
-            value = va_arg(ap, unsigned long);
+            value = va_arg(w.ap, unsigned long);
             break;
 
         case LengthSpec::z:
-            value = static_cast<ssize_t> (va_arg(ap, size_t));
+            value = static_cast<size_t> (va_arg(w.ap, size_t));
             break;
 
         case LengthSpec::hh: {
-            unsigned char v = va_arg(ap, unsigned int);
+            unsigned char v = va_arg(w.ap, unsigned int);
             value = v;
         }
             break;
 
         case LengthSpec::h:
-            value = va_arg(ap, unsigned int);
+            value = va_arg(w.ap, unsigned int);
             break;
 
         case LengthSpec::ll:
         default:
-            value = va_arg(ap, unsigned long long);
+            value = va_arg(w.ap, unsigned long long);
             break;
     }
 
@@ -417,7 +423,7 @@ static char *format_number(char *buf, unsigned long long number, FormatSpec &for
         }
     }
 
-    offset = sign == 0 ? offset : ++offset;
+    offset = sign == 0 ? offset : offset + 1;
     number_str[0] = sign;
     number_len = number_to_string(&number_str[offset],
                                   number,
@@ -427,14 +433,14 @@ static char *format_number(char *buf, unsigned long long number, FormatSpec &for
     return put_with_field_width(buf, number_str, number_len, formatSpec, size);
 }
 
-static char *read_format_unsigned_int(char *buf, FormatSpec &formatSpec, size_t size, va_list &ap)
+static char *read_format_unsigned_int(char *buf, FormatSpec &formatSpec, size_t size, va_list_wrapper &w)
 {
     formatSpec.flags &= ~FormatFlags::F_SPACE;
     formatSpec.flags &= ~FormatFlags::F_PLUS;
     auto value =
-        formatSpec.lengthSpec == LengthSpec::null ? va_arg(ap, unsigned int) : read_unsigned_number(
+        formatSpec.lengthSpec == LengthSpec::null ? va_arg(w.ap, unsigned int) : read_unsigned_number(
             formatSpec,
-            ap);
+            w);
 
     return format_number(buf, value, formatSpec, size);
 }
@@ -442,6 +448,8 @@ static char *read_format_unsigned_int(char *buf, FormatSpec &formatSpec, size_t 
 int vsnprintf(char *buf, size_t max_size, const char *fmt, va_list ap)
 {
     FormatSpec formatSpec;
+    va_list_wrapper wrapper{};
+    va_copy(wrapper.ap, ap);
 
     if (max_size > 0) {
         char *pos = buf;
@@ -459,7 +467,7 @@ int vsnprintf(char *buf, size_t max_size, const char *fmt, va_list ap)
             }
 
             ++fmt;
-            fmt = parse_flags_fw_precision(fmt, formatSpec, ap);
+            fmt = parse_flags_fw_precision(fmt, formatSpec, wrapper);
             fmt = parse_size_specifier(fmt, formatSpec);
 
             if (formatSpec.flags & FormatFlags::F_MINUS) {
@@ -477,8 +485,9 @@ int vsnprintf(char *buf, size_t max_size, const char *fmt, va_list ap)
                     formatSpec.flags &= ~FormatFlags::F_ALT;
                     formatSpec.radix = 10;
                     auto value =
-                        formatSpec.lengthSpec == LengthSpec::null ? va_arg(ap, int) : read_signed_number(formatSpec,
-                                                                                                         ap);
+                        formatSpec.lengthSpec == LengthSpec::null ? va_arg(wrapper.ap, int) : read_signed_number(
+                            formatSpec,
+                            wrapper);
                     formatSpec.negative = value < 0;
 
                     if (value < 0) {
@@ -493,13 +502,13 @@ int vsnprintf(char *buf, size_t max_size, const char *fmt, va_list ap)
 
                 case 'u': {
                     formatSpec.flags &= ~FormatFlags::F_ALT;
-                    pos = read_format_unsigned_int(pos, formatSpec, size - written, ap);
+                    pos = read_format_unsigned_int(pos, formatSpec, size - written, wrapper);
                 }
                     break;
 
                 case 'o': {
                     formatSpec.radix = 8;
-                    pos = read_format_unsigned_int(pos, formatSpec, size - written, ap);
+                    pos = read_format_unsigned_int(pos, formatSpec, size - written, wrapper);
 
                 }
                     break;
@@ -509,13 +518,13 @@ int vsnprintf(char *buf, size_t max_size, const char *fmt, va_list ap)
                 case 'x': {
                     {
                         formatSpec.radix = 16;
-                        pos = read_format_unsigned_int(pos, formatSpec, size - written, ap);
+                        pos = read_format_unsigned_int(pos, formatSpec, size - written, wrapper);
                     }
                 }
                     break;
 
                 case 'p': {
-                    auto value = read_unsigned_number(formatSpec, ap);
+                    auto value = read_unsigned_number(formatSpec, wrapper);
 
                     if (value > 0) {
                         formatSpec.flags &= ~FormatFlags::F_ZERO;
@@ -531,13 +540,13 @@ int vsnprintf(char *buf, size_t max_size, const char *fmt, va_list ap)
                         pos = format_number(pos, value, formatSpec, size - written);
                     }
                     else {
-                        pos = format_string(pos, formatSpec, size - i, ap, kNil);
+                        pos = format_string(pos, formatSpec, size - i, wrapper, kNil);
                     }
                 }
                     break;
 
                 case 'n': {
-                    size_t *ptr = va_arg(ap, size_t*);
+                    size_t *ptr = va_arg(wrapper.ap, size_t*);
 
                     if (ptr) {
                         *ptr = written;
@@ -546,11 +555,11 @@ int vsnprintf(char *buf, size_t max_size, const char *fmt, va_list ap)
                     break;
 
                 case 'c':
-                    pos = format_char(pos, formatSpec, size - written, ap);
+                    pos = format_char(pos, formatSpec, size - written, wrapper);
                     break;
 
                 case 's':
-                    pos = format_string(pos, formatSpec, size - written, ap);
+                    pos = format_string(pos, formatSpec, size - written, wrapper);
                     break;
 
                 default:
