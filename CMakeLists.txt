@@ -6,7 +6,7 @@ set(ARCH "x86" CACHE STRING "Target architecture")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-#set(ENABLE_TEST ON)
+set(ENABLE_TEST ON)
 
 add_library(osdev-libstdc STATIC
         cstring.cpp
@@ -32,17 +32,15 @@ target_include_directories(osdev-libstdc
 target_compile_options(osdev-libstdc
         PRIVATE
         -Wall
-        -ffreestanding
         -fno-exceptions
         -fno-rtti
         -fno-stack-protector
         -nostdlib
-        -std=gnu++2a
-
+        -std=gnu++20
 )
 
 if (DEFINED OSDEV_FREESTANDING)
-    message("here")
+    message("OSDEV_FREESTANDING")
     target_compile_definitions(osdev-libstdc
             PUBLIC
             __OSDEV_FREESTANDING=1
@@ -87,18 +85,18 @@ if (DEFINED ENABLE_TEST AND NOT DEFINED OSDEV_FREESTANDING)
 
     enable_testing()
 
-    add_executable(cstring_test
+    add_executable(osdev_libstdc_test
             tests/cstring_test.cpp
             tests/vsnprintf_test.cpp
             tests/ctype_test.cpp
     )
 
-    target_link_libraries(cstring_test
+    target_link_libraries(osdev_libstdc_test
             PRIVATE
             osdev-libstdc
             GTest::gtest_main
     )
 
     include(GoogleTest)
-    gtest_discover_tests(cstring_test)
+    gtest_discover_tests(osdev_libstdc_test)
 endif()

@@ -22,13 +22,13 @@
  * THE SOFTWARE.
  */
 
-#include "errno.h"
+#include "cerrno.h"
 #include "cstring.h"
 
 __MAYBE_BEGIN_STD_NAMESPACE
 
 #if !defined(__STD_LIBC_TEST)
-int errno;
+extern int errno;
 #endif
 
 static const char *kErrorStrings[] = {
@@ -177,7 +177,9 @@ static const char *kErrorStrings[] = {
 char *strerror(int errnum)
 {
     if (errnum < 0 || errnum > ENOTSUP) {
+#if !defined(__STD_LIBC_TEST)
         errno = EINVAL;
+#endif
         return nullptr;
     }
 

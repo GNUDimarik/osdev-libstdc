@@ -1,6 +1,6 @@
 #ifndef ERRNO_H
 #define ERRNO_H
 
-#include <libstdc/errno.h>
+#include <libstdc/cerrno.h>
 
 #endif //ERRNO_H
