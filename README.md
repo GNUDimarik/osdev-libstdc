@@ -1,14 +1,16 @@
 # osdev-libstdc
 Minimal libstdc library for bare metal osdev
 
-## clone
+## Build:
 
-# SSH
+#### SSH
 git clone --recurse-submodules git@github.com:GNUDimarik/osdev-libstdc.git
-# HTTP
+#### HTTP
 git clone --recurse-submodules https://github.com/GNUDimarik/osdev-libstdc.git
 
-## Build:
+cd osdev-libstdc
+mkdir build && cd build
+
 cmake -DENABLE_TEST=1 ../
 make -j $(nproc)
 
