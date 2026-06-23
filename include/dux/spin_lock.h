@@ -86,7 +86,7 @@ public:
         __atomic_store_n(&_M_value, kFree, __ATOMIC_RELEASE);
     }
 private:
-    int _M_value{kFree};
+    alignas(__GCC_DESTRUCTIVE_SIZE) int _M_value{kFree};
 };
 }
 
