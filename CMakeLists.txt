@@ -5,6 +5,8 @@ project(osdev-libstdc LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(ENABLE_TEST ON)
+# hardcoded for now
+set(ARCH x86)
 
 add_library(osdev-libstdc STATIC
         src/cstring.cpp
@@ -22,6 +24,8 @@ add_library(osdev-libstdc STATIC
         include/posix/posix_strings.h
         include/arch/x86/asm/cpu.h
         include/arch/x86/asm/barrier.h
+        include/dux/spin_lock.h
+        include/malloc.h
 )
 
 target_include_directories(osdev-libstdc
@@ -103,6 +107,7 @@ if (DEFINED ENABLE_TEST AND NOT DEFINED OSDEV_FREESTANDING)
             tests/vsnprintf_test.cpp
             tests/ctype_test.cpp
             malloc/allocator_test.cpp
+            tests/spin_lock_test.cpp
     )
 
     target_link_libraries(osdev_libstdc_test

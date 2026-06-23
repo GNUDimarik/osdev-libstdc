@@ -1,4 +1,5 @@
-/**
+
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2026 Dmitry Adzhiev <dmitry.adjiev@gmail.com>
@@ -22,9 +23,20 @@
  * THE SOFTWARE.
  */
 
-#ifndef ARCH_X86_ASM_CPU_H_
-#define ARCH_X86_ASM_CPU_H_
+#ifndef OSDEV_DUX_MALLOC_H
+#define OSDEV_DUX_MALLOC_H
 
-#define cpu_relax() __asm__ __volatile__("pause":: : "memory")
+#include <config.h>
+#include <stdint.h>
 
-#endif //#endif
+__BEGIN_DECLS
+
+void *aligned_alloc(size_t alignment, size_t size);
+void *calloc(size_t num, size_t size);
+void free(void *ptr);
+void *malloc(size_t size);
+void *realloc(void *ptr, size_t new_size);
+
+__END_DECLS
+
+#endif //OSDEV_DUX_MALLOC_H
