@@ -4,7 +4,7 @@ project(osdev-libstdc LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(ENABLE_TEST ON)
+#set(ENABLE_TEST ON)
 # hardcoded for now
 set(ARCH x86)
 

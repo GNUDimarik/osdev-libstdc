@@ -27,8 +27,12 @@
 
 #include "config.h"
 #include "abort.h"
+#include <stddef.h>
 
 __BEGIN_STD_NAMESPACE
+
+inline constexpr size_t hardware_destructive_interference_size = __GCC_DESTRUCTIVE_SIZE;
+inline constexpr size_t hardware_constructive_interference_size = __GCC_CONSTRUCTIVE_SIZE;
 
 enum memory_order
 {
