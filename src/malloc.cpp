@@ -1,4 +1,3 @@
-
 /*
  * The MIT License (MIT)
  *
@@ -23,22 +22,44 @@
  * THE SOFTWARE.
  */
 
-#ifndef OSDEV_DUX_MALLOC_H
-#define OSDEV_DUX_MALLOC_H
+#include "../include/dux/spin_lock.h"
+#include "../malloc/memory.h"
 
-#include <config.h>
-#include <stdint.h>
+namespace
+{
+static dux::spin_lock gLock;
+}
 
 __MAYBE_BEGIN_STD_NAMESPACE
-__BEGIN_DECLS
 
-void *aligned_alloc(size_t alignment, size_t size);
-void *calloc(size_t num, size_t size);
-void free(void *ptr);
-void *malloc(size_t size);
-void *realloc(void *ptr, size_t new_size);
+void *aligned_alloc(size_t alignment, size_t size)
+{
+    __STD_NAMESPACE::lock_guard g(gLock);
+    return mem_malloc_aligned(alignment, size);
+}
 
-__END_DECLS
+void *calloc(size_t num, size_t size)
+{
+    __STD_NAMESPACE::lock_guard g(gLock);
+    return mem_calloc(num, size);
+}
+
+void free(void *ptr)
+{
+    __STD_NAMESPACE::lock_guard g(gLock);
+    mem_free(ptr);
+}
+
+void *malloc(size_t size)
+{
+    __STD_NAMESPACE::lock_guard g(gLock);
+    return mem_malloc(size);
+}
+
+void *realloc(void *ptr, size_t new_size)
+{
+    __STD_NAMESPACE::lock_guard g(gLock);
+    return mem_realloc(ptr, new_size);
+}
+
 __MAYBE_END_STD_NAMESPACE
-
-#endif //OSDEV_DUX_MALLOC_H

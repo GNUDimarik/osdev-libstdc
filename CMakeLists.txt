@@ -14,6 +14,7 @@ add_library(osdev-libstdc STATIC
         src/vsnprintf.cpp
         src/cctype.cpp
         malloc/memory.cpp
+        src/malloc.cpp
         malloc/memory.h
         malloc/logging.h
         posix/posix_strings.cpp
@@ -79,12 +80,12 @@ if (DEFINED OSDEV_FREESTANDING)
             -nostdlib
             -nodefaultlibs
     )
-else()
+else ()
     target_compile_definitions(osdev-libstdc
             PUBLIC
             __STD_LIBC_TEST=1
     )
-endif()
+endif ()
 
 if (DEFINED ENABLE_TEST AND NOT DEFINED OSDEV_FREESTANDING)
     cmake_policy(SET CMP0135 NEW)
@@ -118,4 +119,4 @@ if (DEFINED ENABLE_TEST AND NOT DEFINED OSDEV_FREESTANDING)
 
     include(GoogleTest)
     gtest_discover_tests(osdev_libstdc_test)
-endif()
+endif ()
