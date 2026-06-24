@@ -76,7 +76,7 @@ The library provides a lightweight freestanding implementation of the `printf` f
 Null pointers are formatted as:
 
 ```text
-(nil)
+%p (nil) %s (null)
 ```
 
 ## Implemented Functions
