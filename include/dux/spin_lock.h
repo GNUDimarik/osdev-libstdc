@@ -27,6 +27,7 @@
 
 #include <asm/cpu.h>
 #include <config.h>
+#include "../atomic.h"
 
 __BEGIN_STD_NAMESPACE
 
@@ -57,29 +58,33 @@ __END_STD_NAMESPACE
 namespace dux
 {
 
+static constexpr int kFree = 0;
+
+static constexpr int kLocked = 1;
+
 class spin_lock final
 {
 public:
-    static constexpr const int kFree = 0;
-    static constexpr const int kLocked = 1;
-
     spin_lock() = default;
     spin_lock(const spin_lock &) = delete;
     spin_lock &operator=(const spin_lock &) = delete;
 
     bool try_lock()
     {
-        return __atomic_exchange_n(&_M_value, kLocked, __ATOMIC_ACQUIRE) == kFree;
+        int expected = kFree;
+        return _M_value.compare_exchange_strong(expected, kLocked, __STD_NAMESPACE::memory_order_acquire);
     }
 
     void lock()
     {
         for (;;) {
-            while (__atomic_load_n(&_M_value, __ATOMIC_RELAXED) != kFree) {
+            while (_M_value.load(__STD_NAMESPACE::memory_order_relaxed)) {
                 cpu_relax();
             }
 
-            if (__atomic_exchange_n(&_M_value, kLocked, __ATOMIC_ACQUIRE) == kFree) {
+            int expected = kFree;
+
+            if (_M_value.compare_exchange_strong(expected, kLocked, __STD_NAMESPACE::memory_order_acquire)) {
                 return;
             }
 
@@ -89,10 +94,10 @@ public:
 
     void unlock()
     {
-        __atomic_store_n(&_M_value, kFree, __ATOMIC_RELEASE);
+        _M_value.store(kFree, __STD_NAMESPACE::memory_order_release);
     }
 private:
-    alignas(__GCC_DESTRUCTIVE_SIZE) int _M_value{kFree};
+    alignas(__GCC_DESTRUCTIVE_SIZE) __STD_NAMESPACE::atomic<int> _M_value = kFree;
 };
 } // namespace dux
 

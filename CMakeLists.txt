@@ -27,6 +27,9 @@ add_library(osdev-libstdc STATIC
         include/arch/x86/asm/barrier.h
         include/dux/spin_lock.h
         include/malloc.h
+        include/atomic.h
+        src/abort.cpp
+        include/abort.h
 )
 
 target_include_directories(osdev-libstdc
@@ -109,6 +112,7 @@ if (DEFINED ENABLE_TEST AND NOT DEFINED OSDEV_FREESTANDING)
             tests/ctype_test.cpp
             malloc/allocator_test.cpp
             tests/spin_lock_test.cpp
+            tests/atomic_test.cpp
     )
 
     target_link_libraries(osdev_libstdc_test
