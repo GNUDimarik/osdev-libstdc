@@ -74,10 +74,16 @@ public:
 
     void lock()
     {
-        while (__atomic_exchange_n(&_M_value, kLocked, __ATOMIC_ACQUIRE) != kFree) {
+        for (;;) {
             while (__atomic_load_n(&_M_value, __ATOMIC_RELAXED) != kFree) {
                 cpu_relax();
             }
+
+            if (__atomic_exchange_n(&_M_value, kLocked, __ATOMIC_ACQUIRE) == kFree) {
+                return;
+            }
+
+            cpu_relax();
         }
     }
 
@@ -88,6 +94,6 @@ public:
 private:
     alignas(__GCC_DESTRUCTIVE_SIZE) int _M_value{kFree};
 };
-}
+} // namespace dux
 
 #endif //OSDEV_LIB_STDC_DUX_SPIN_LOCK_H
