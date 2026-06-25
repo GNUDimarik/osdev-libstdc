@@ -78,7 +78,7 @@ public:
     void lock()
     {
         for (;;) {
-            while (_M_value.load(__STD_NAMESPACE::memory_order_relaxed)) {
+            while (_M_value.load(__STD_NAMESPACE::memory_order_relaxed) == kLocked) {
                 cpu_relax();
             }
 
