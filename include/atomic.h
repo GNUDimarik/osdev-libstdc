@@ -49,23 +49,15 @@ namespace detail
 static memory_order __cas_failure_order(memory_order order) noexcept
 {
     switch (order) {
-        case memory_order_relaxed:
-            return memory_order_relaxed;
-
-        case memory_order_acquire:
-            return memory_order_acquire;
-
         case memory_order_release:
             return memory_order_relaxed;
 
         case memory_order_acq_rel:
             return memory_order_acquire;
 
-        case memory_order_seq_cst:
-            return memory_order_seq_cst;
+        default:
+            return order;
     }
-
-    __STD_NAMESPACE::abort();
 }
 
 } // namespace detail
