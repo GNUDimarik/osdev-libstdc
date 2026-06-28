@@ -359,6 +359,8 @@ git clone --recurse-submodules https://github.com/GNUDimarik/osdev-libstdc.git
 
 ## Build
 
+GCC Only!!!
+
 ```bash
 cd osdev-libstdc
 
@@ -369,6 +371,9 @@ cmake -DENABLE_TEST=1 -DENABLE_BENCHMARK=1 -DARCH=x86 ../
 make -j $(nproc)
 ```
 ## Freestanding build
+
+GCC Only!!!
+
 ```bash
 cmake -DARCH=x86 -DCMAKE_CXX_COMPILER=your_toolchain-g++ -DCMAKE_C_COMPILER=your_toolchain-gcc -DOSDEV_FREESTANDING=1 -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY ../
 
