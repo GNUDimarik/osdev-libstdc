@@ -368,6 +368,16 @@ cmake -DENABLE_TEST=1 -DENABLE_BENCHMARK=1 -DARCH=x86 ../
 
 make -j $(nproc)
 ```
+## Freestanding build
+```bash
+cmake -DARCH=x86 -DCMAKE_CXX_COMPILER=your_toolchain-g++ -DCMAKE_C_COMPILER=your_toolchain-gcc -DOSDEV_FREESTANDING=1 -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY ../
+
+Example:
+
+cmake -DARCH=x86 -DCMAKE_CXX_COMPILER=/mnt/d/osdev/i686-elf/bin/i686-elf-g++ -DCMAKE_C_COMPILER=/mnt/d/osdev/i686-elf/bin/i686-elf-gcc -DOSDEV_FREESTANDING=1 -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY ../
+
+make -j $(nproc)
+```
 
 ## Running Tests
 
