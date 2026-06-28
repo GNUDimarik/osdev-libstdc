@@ -25,6 +25,6 @@
 #ifndef ARCH_X86_ASM_CPU_H_
 #define ARCH_X86_ASM_CPU_H_
 
-#define cpu_relax() __asm__ __volatile__("pause":: : "memory")
+#define cpu_relax() __asm__ __volatile__("pause"::: "memory")
 
 #endif //#endif
