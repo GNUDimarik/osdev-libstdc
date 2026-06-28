@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 #set(ENABLE_TEST ON)
 # hardcoded for now
-set(ARCH x86)
+# set(ARCH x86)
 
 add_library(osdev-libstdc STATIC
         src/cstring.cpp
