@@ -97,9 +97,6 @@ public:
         _M_value.store(kFree, __STD_NAMESPACE::memory_order_release);
     }
 private:
-#ifndef OSDEV_DISABLE_SPINLOCK_ALIGNMENT
-    alignas(__STD_NAMESPACE::hardware_destructive_interference_size)
-#endif
     __STD_NAMESPACE::atomic<int> _M_value = kFree;
 };
 } // namespace dux
