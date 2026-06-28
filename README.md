@@ -37,6 +37,7 @@ The project is a part of the **DUX Operating System** and is intended to work wi
 | ----------- | ------ |
 | `printf.h`  | ✓      |
 | `malloc.h`  | ✓      |
+| `atomic.h`  | ✓      |
 | `string.h`  | ✓      |
 | `strings.h` | ✓      |
 | `ctype.h`   | ✓      |
@@ -187,6 +188,44 @@ allocation failed -> nullptr
 ```
 
 ---
+
+# Atomic Operations (`atomic.h`)
+
+```cpp
+#include <atomic.h>
+```
+
+The library provides a lightweight freestanding implementation of `std::atomic` based on GCC `__atomic` builtins.
+
+## Implemented Constants
+
+`hardware_destructive_interference_size`, `hardware_constructive_interference_size`
+
+## Supported Memory Orders
+
+`memory_order_relaxed`, `memory_order_acquire`, `memory_order_release`, `memory_order_acq_rel`, `memory_order_seq_cst`
+
+## Implemented Type
+
+`std::atomic<T>`
+
+## Implemented Operations
+
+`operator=`, `is_lock_free`, `store`, `load`, `operator T`, `exchange`, `compare_exchange_weak`, `compare_exchange_strong`
+
+## Features
+
+* Freestanding compatible
+* No operating system dependencies
+* Based on GCC `__atomic` builtins
+* Supports explicit memory ordering
+* Provides volatile and non-volatile overloads
+* Suitable for low-level synchronization primitives
+* Used as a foundation for `dux::spin_lock`
+
+## Notes
+
+`memory_order_consume` is intentionally not implemented.
 
 # Concurrency (`dux/spin_lock.h`)
 
