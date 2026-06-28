@@ -25,12 +25,6 @@
 #ifndef ARCH_X86_ASM_CPU_H_
 #define ARCH_X86_ASM_CPU_H_
 
-#include <immintrin.h>
-
-#if 0
 #define cpu_relax() __asm__ __volatile__("pause":: : "memory")
-#else
-#define cpu_relax()  _mm_pause()
-#endif
 
 #endif //#endif
