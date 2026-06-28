@@ -325,7 +325,7 @@ cd osdev-libstdc
 
 mkdir build && cd build
 
-cmake -DENABLE_TEST=1 ../
+cmake -DENABLE_TEST=1 -DENABLE_BENCHMARK=1 -DARCH=x86 ../
 
 make -j $(nproc)
 ```
