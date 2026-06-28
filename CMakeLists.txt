@@ -124,3 +124,7 @@ if (DEFINED ENABLE_TEST AND NOT DEFINED OSDEV_FREESTANDING)
     include(GoogleTest)
     gtest_discover_tests(osdev_libstdc_test)
 endif ()
+
+if (DEFINED ENABLE_BENCHMARKS)
+    add_subdirectory(benchmarks)
+endif()
