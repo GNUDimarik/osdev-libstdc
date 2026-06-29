@@ -50,8 +50,10 @@
 
 #ifdef __STD_LIBC_TEST
 #   define __MAYBE_BEGIN_STD_NAMESPACE __BEGIN_STD_NAMESPACE
+#   define __OSDEV_STD_SYMBOL(name) __STD_NAMESPACE::name
 #else
 #   define __MAYBE_BEGIN_STD_NAMESPACE
+#   define __OSDEV_STD_SYMBOL(name) name
 #endif
 
 #ifdef __STD_LIBC_TEST
