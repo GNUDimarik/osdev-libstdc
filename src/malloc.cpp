@@ -33,6 +33,12 @@ static dux::spin_lock gLock;
 __MAYBE_BEGIN_STD_NAMESPACE
 __BEGIN_DECLS
 
+int libstdc_allocator_initialize(void* base, size_t size)
+{
+    __STD_NAMESPACE::lock_guard g(gLock);
+   return mem_initialize(base, size);
+}
+
 void *aligned_alloc(size_t alignment, size_t size)
 {
     __STD_NAMESPACE::lock_guard g(gLock);
