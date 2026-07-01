@@ -2,7 +2,6 @@
 
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Compiler](https://img.shields.io/badge/GCC-16.1+-blue)
-![C++](https://img.shields.io/badge/C%2B%2B-20-blue)
 ![Platform](https://img.shields.io/badge/platform-freestanding-orange)
 
 A lightweight freestanding C/C++ library with zero external dependencies designed for operating system development.
