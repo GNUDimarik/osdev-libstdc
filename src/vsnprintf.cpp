@@ -33,6 +33,7 @@
 #define MAX_NUMBER_LEN 66
 
 __MAYBE_BEGIN_STD_NAMESPACE
+__BEGIN_DECLS
 
 static constexpr const char *kNull = "(null)";
 
@@ -599,4 +600,5 @@ int snprintf(char *buffer, size_t size, const char *fmt, ...)
     return res;
 }
 
+__END_DECLS
 __MAYBE_END_STD_NAMESPACE

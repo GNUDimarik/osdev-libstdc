@@ -33,12 +33,15 @@
 #include <cstdio>
 #include "config.h"
 
-namespace __STD_NAMESPACE
-{
+__BEGIN_STD_NAMESPACE
+__BEGIN_DECLS
+
 int vsnprintf(char *buf, size_t size, const char *fmt, va_list ap);
 int sprintf(char *buffer, const char *fmt, ...);
 int snprintf(char *buffer, size_t size, const char *fmt, ...);
-}
+
+__END_DECLS
+__END_STD_NAMESPACE
 
 static constexpr const char *kNull = "(null)";
 

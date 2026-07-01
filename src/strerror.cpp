@@ -26,6 +26,7 @@
 #include "cstring.h"
 
 __MAYBE_BEGIN_STD_NAMESPACE
+__BEGIN_DECLS
 
 #if !defined(__STD_LIBC_TEST)
 extern int errno;
@@ -186,4 +187,5 @@ char *strerror(int errnum)
     return const_cast<char *>(kErrorStrings[errnum]);
 }
 
+__END_DECLS
 __MAYBE_END_STD_NAMESPACE

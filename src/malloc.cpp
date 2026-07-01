@@ -31,6 +31,7 @@ static dux::spin_lock gLock;
 }
 
 __MAYBE_BEGIN_STD_NAMESPACE
+__BEGIN_DECLS
 
 void *aligned_alloc(size_t alignment, size_t size)
 {
@@ -62,4 +63,5 @@ void *realloc(void *ptr, size_t new_size)
     return mem_realloc(ptr, new_size);
 }
 
+__END_DECLS
 __MAYBE_END_STD_NAMESPACE

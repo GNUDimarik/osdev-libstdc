@@ -25,6 +25,9 @@
 #include "cctype.h"
 
 __MAYBE_BEGIN_STD_NAMESPACE
+#ifndef __STD_LIBC_TEST
+__BEGIN_DECLS
+#endif
 
 int toascii(int c) __NOEXCEPT
 {
@@ -115,4 +118,7 @@ int toupper(int c) __NOEXCEPT
     return c;
 }
 
+#ifndef __STD_LIBC_TEST
+__END_DECLS
+#endif
 __MAYBE_END_STD_NAMESPACE
