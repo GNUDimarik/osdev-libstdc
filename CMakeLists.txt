@@ -59,11 +59,10 @@ if (DEFINED OSDEV_FREESTANDING)
 
     target_compile_definitions(osdev-libstdc
             PUBLIC
-            __OSDEV_FREESTANDING=1
+            __OSDEV_FREESTANDING__=1
             __OSDEV_HAVE_ERRNO_H__=1
             __OSDEV_HAVE_STRING_H__=1
             __OSDEV_HAVE_CONFIG_H__=1
-            __OSDEV_DUX_LIBSTDC__
             __POSIX_STRINGS_MACRO__
     )
 
@@ -117,8 +116,8 @@ if (DEFINED ENABLE_TEST AND NOT DEFINED OSDEV_FREESTANDING)
 
     target_link_libraries(osdev_libstdc_test
             PRIVATE
-            osdev-libstdc
             GTest::gtest_main
+            osdev-libstdc
     )
 
     include(GoogleTest)

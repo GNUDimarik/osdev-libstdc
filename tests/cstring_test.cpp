@@ -6,10 +6,11 @@
 //
 //===----------------------------------------------------------------------===//
 #include <gtest/gtest.h>
+#include <vector>
 #include "../include/posix/posix_strings.h"
 #include "cstring.h"
 #include "utils.h"
-#include <vector>
+#include "../include/malloc.h"
 
 TEST(LlvmLibcBcmpTest, CmpZeroByte)
 {
@@ -2441,4 +2442,45 @@ TEST(LlvmLibcStrerrorTest, CompareMessages) {
     for (int i = 0; i <= ENOTSUP; i++) {
         EXPECT_STREQ(strerrorTest::kErrorStrings[i], __STD_NAMESPACE::strerror(i));
     }
+}
+
+#define STRDUP_HEAP_SIZE 64
+
+TEST(LlvmLibcStrDupTest, EmptyString) {
+    char heap[STRDUP_HEAP_SIZE];
+    __STD_NAMESPACE::libstdc_allocator_initialize(heap, STRDUP_HEAP_SIZE);
+    const char *empty = "";
+
+    char *result = __STD_NAMESPACE::strdup(empty);
+    ASSERT_EQ(errno, 0);
+
+    ASSERT_NE(result, static_cast<char *>(nullptr));
+    ASSERT_NE(empty, const_cast<const char *>(result));
+    ASSERT_STREQ(empty, result);
+    __OSDEV_STD_SYMBOL(free)(result);
+}
+
+TEST(LlvmLibcStrDupTest, AnyString) {
+    char heap[STRDUP_HEAP_SIZE];
+    __STD_NAMESPACE::libstdc_allocator_initialize(heap, STRDUP_HEAP_SIZE);
+
+    const char *abc = "abc";
+
+    char *result = __STD_NAMESPACE::strdup(abc);
+    ASSERT_EQ(errno, 0);
+
+    ASSERT_NE(result, static_cast<char *>(nullptr));
+    ASSERT_NE(abc, const_cast<const char *>(result));
+    ASSERT_STREQ(abc, result);
+    __OSDEV_STD_SYMBOL(free)(result);
+}
+
+TEST(LlvmLibcStrDupTest, NullPtr) {
+    char heap[STRDUP_HEAP_SIZE];
+    __STD_NAMESPACE::libstdc_allocator_initialize(heap, STRDUP_HEAP_SIZE);
+
+    char *result = __STD_NAMESPACE::strdup(nullptr);
+    ASSERT_EQ(errno, 0);
+
+    ASSERT_EQ(result, static_cast<char *>(nullptr));
 }

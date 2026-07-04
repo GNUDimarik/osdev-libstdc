@@ -30,7 +30,10 @@
 #include <stdint.h>
 
 __MAYBE_BEGIN_STD_NAMESPACE
+
+#ifndef __STD_LIBC_TEST
 __BEGIN_DECLS
+#endif
 
 int libstdc_allocator_initialize(void* base, size_t size);
 void *aligned_alloc(size_t alignment, size_t size);
@@ -39,7 +42,10 @@ void free(void *ptr);
 void *malloc(size_t size);
 void *realloc(void *ptr, size_t new_size);
 
+#ifndef __STD_LIBC_TEST
 __END_DECLS
+#endif
+
 __MAYBE_END_STD_NAMESPACE
 
 #endif //OSDEV_DUX_MALLOC_H

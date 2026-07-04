@@ -31,7 +31,10 @@ static dux::spin_lock gLock;
 }
 
 __MAYBE_BEGIN_STD_NAMESPACE
+
+#ifndef __STD_LIBC_TEST
 __BEGIN_DECLS
+#endif
 
 int libstdc_allocator_initialize(void* base, size_t size)
 {
@@ -69,5 +72,8 @@ void *realloc(void *ptr, size_t new_size)
     return mem_realloc(ptr, new_size);
 }
 
+#ifndef __STD_LIBC_TEST
 __END_DECLS
+#endif
+
 __MAYBE_END_STD_NAMESPACE

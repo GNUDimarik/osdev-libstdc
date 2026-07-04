@@ -33,7 +33,7 @@
 
 #endif /* #ifndef __END_DECLS */
 
-#ifndef __STD_LIBC_TEST
+#if !defined(__STD_LIBC_TEST) && defined(__OSDEV_FREESTANDING__)
 #   define  __STD_NAMESPACE std
 #   define  __BEGIN_STDLIB_TEST_NAMESPACE
 #   define __END_STDLIB_TEST_NAMESPACE
@@ -48,7 +48,7 @@
 #define __BEGIN_STD_NAMESPACE namespace __STD_NAMESPACE {
 #define __END_STD_NAMESPACE }
 
-#ifdef __STD_LIBC_TEST
+#if defined(__STD_LIBC_TEST) || !defined(__OSDEV_FREESTANDING__)
 #   define __MAYBE_BEGIN_STD_NAMESPACE __BEGIN_STD_NAMESPACE
 #   define __OSDEV_STD_SYMBOL(name) __STD_NAMESPACE::name
 #else

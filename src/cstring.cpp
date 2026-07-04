@@ -26,9 +26,13 @@
 #include <ctype.h>
 #include "config.h"
 #include "utils.h"
+#include "../malloc.h"
 
 __MAYBE_BEGIN_STD_NAMESPACE
+
+#ifndef __STD_LIBC_TEST
 __BEGIN_DECLS
+#endif
 
 void *memcpy(void *__restrict__ dest, const void *__restrict__ src, size_t length)
 {
@@ -446,5 +450,18 @@ char *stpcpy(char *dest, const char *src)
     return dest + src_len;
 }
 
+char *strdup(const char *s)
+{
+    if (s) {
+        char *str = reinterpret_cast<char *> (__OSDEV_STD_SYMBOL(malloc)(strlen(s) + 1));
+        return strcpy(str, s);
+    }
+
+    return nullptr;
+}
+
+#ifndef __STD_LIBC_TEST
 __END_DECLS
+#endif
+
 __MAYBE_END_STD_NAMESPACE

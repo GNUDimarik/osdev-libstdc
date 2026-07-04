@@ -28,6 +28,8 @@
 
 #if !defined(__STD_LIBC_TEST)
 extern int errno;
+//#else
+//[[maybe_unused]] static int errno = 0;
 #endif
 
 #define EPERM 1 /* Operation not permitted */
