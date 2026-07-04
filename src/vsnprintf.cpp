@@ -452,11 +452,16 @@ int vsnprintf(char *buf, size_t max_size, const char *fmt, va_list ap)
 {
     FormatSpec formatSpec;
     va_list_wrapper wrapper{};
+
+    if (max_size == 0) {
+        return 0;
+    }
+
     va_copy(wrapper.ap, ap);
 
     if (max_size > 0 && max_size < static_cast<size_t>(INT_MAX)) {
         char *pos = buf;
-        int size = static_cast<int>(max_size > 0 ? max_size - 1 : max_size);
+        int size = static_cast<int>(max_size - 1);
         ptrdiff_t written = 0;
         // %[flags][field_width][.precision][size specifier]specifier
         for (int i = 0; *fmt && written < size; ++i, ++fmt) {
