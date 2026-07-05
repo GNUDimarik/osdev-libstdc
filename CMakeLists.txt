@@ -30,6 +30,7 @@ add_library(osdev-libstdc STATIC
         include/atomic.h
         src/abort.cpp
         include/abort.h
+        include/memory.h
 )
 
 target_include_directories(osdev-libstdc
