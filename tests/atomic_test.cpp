@@ -109,3 +109,47 @@ TEST(Atomic, VolatileOperations)
 
     EXPECT_TRUE(a.is_lock_free());
 }
+
+TEST(AtomicRef, BasicOperations)
+{
+    int value = 0;
+
+    __STD_NAMESPACE::atomic_ref<int> ref(value);
+
+    EXPECT_EQ(value, 0);
+    EXPECT_EQ(ref.load(), 0);
+
+    ref.store(10);
+    EXPECT_EQ(value, 10);
+    EXPECT_EQ(ref.load(), 10);
+
+    ref = 20;
+    EXPECT_EQ(value, 20);
+    EXPECT_EQ(ref.load(), 20);
+
+    EXPECT_EQ(ref.exchange(30), 20);
+    EXPECT_EQ(value, 30);
+
+    int expected = 30;
+    EXPECT_TRUE(ref.compare_exchange_strong(expected, 40));
+    EXPECT_EQ(value, 40);
+    EXPECT_EQ(expected, 30);
+
+    expected = 30;
+    EXPECT_FALSE(ref.compare_exchange_strong(expected, 50));
+    EXPECT_EQ(value, 40);
+    EXPECT_EQ(expected, 40);
+}
+
+TEST(AtomicRef, ModifiesOriginalObject)
+{
+    uint8_t byte = 0;
+
+    __STD_NAMESPACE::atomic_ref<uint8_t> ref(byte);
+
+    ref.store(1, __STD_NAMESPACE::memory_order_release);
+
+    EXPECT_EQ(byte, 1);
+
+    EXPECT_EQ(ref.load(__STD_NAMESPACE::memory_order_acquire), 1);
+}
