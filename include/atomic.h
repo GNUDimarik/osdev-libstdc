@@ -325,7 +325,7 @@ public:
     friend _Type *__get_atomic_ptr<>(const atomic_ref<_Type> *);
     friend _Type *__get_atomic_ptr<>(const volatile atomic_ref<_Type> *);
 
-    using basic_atomic<_Type, atomic<_Type>>::operator=;
+    using basic_atomic<_Type, atomic_ref<_Type>>::operator=;
 
     atomic_ref() = delete;
     explicit atomic_ref(_Type &__v)
