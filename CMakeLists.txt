@@ -65,6 +65,7 @@ if (DEFINED OSDEV_FREESTANDING)
             __OSDEV_HAVE_STRING_H__=1
             __OSDEV_HAVE_CONFIG_H__=1
             __POSIX_STRINGS_MACRO__
+            __OSDEV_DUX_LIBSTDC__
     )
 
     target_compile_options(osdev-libstdc
