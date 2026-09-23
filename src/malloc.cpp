@@ -33,10 +33,10 @@ dux::spin_lock gLock;
 __MAYBE_BEGIN_STD_NAMESPACE
 
 #ifndef __STD_LIBC_TEST
+    template <typename _Lock> using __lock_guard = dux::irq_save_lock_guard<_Lock>;
 __BEGIN_DECLS
-template <typename _Lock> using __lock_guard = dux::irq_save_lock_guard<_Lock>;
 #else
-template <typename _Lock> using __lock_guard = __STD_NAMESPACE::lock_guard<_Lock>;
+    template <typename _Lock> using __lock_guard = __STD_NAMESPACE::lock_guard<_Lock>;
 #endif
 
 int libstdc_allocator_initialize(void* base, size_t size)
