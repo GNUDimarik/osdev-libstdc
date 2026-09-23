@@ -27,48 +27,51 @@
 
 namespace
 {
-static dux::spin_lock gLock;
+dux::spin_lock gLock;
 }
 
 __MAYBE_BEGIN_STD_NAMESPACE
 
 #ifndef __STD_LIBC_TEST
 __BEGIN_DECLS
+template <typename _Lock> using __lock_guard = dux::irq_save_lock_guard<_Lock>;
+#else
+template <typename _Lock> using __lock_guard = __STD_NAMESPACE::lock_guard<_Lock>;
 #endif
 
 int libstdc_allocator_initialize(void* base, size_t size)
 {
-    __STD_NAMESPACE::lock_guard g(gLock);
+   __lock_guard g(gLock);
    return mem_initialize(base, size);
 }
 
 void *aligned_alloc(size_t alignment, size_t size)
 {
-    __STD_NAMESPACE::lock_guard g(gLock);
+    __lock_guard g(gLock);
     return mem_malloc_aligned(alignment, size);
 }
 
 void *calloc(size_t num, size_t size)
 {
-    __STD_NAMESPACE::lock_guard g(gLock);
+    __lock_guard g(gLock);
     return mem_calloc(num, size);
 }
 
 void free(void *ptr)
 {
-    __STD_NAMESPACE::lock_guard g(gLock);
+    __lock_guard g(gLock);
     mem_free(ptr);
 }
 
 void *malloc(size_t size)
 {
-    __STD_NAMESPACE::lock_guard g(gLock);
+    __lock_guard g(gLock);
     return mem_malloc(size);
 }
 
 void *realloc(void *ptr, size_t new_size)
 {
-    __STD_NAMESPACE::lock_guard g(gLock);
+    __lock_guard g(gLock);
     return mem_realloc(ptr, new_size);
 }
 

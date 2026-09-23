@@ -25,6 +25,50 @@
 #ifndef ARCH_X86_ASM_CPU_H_
 #define ARCH_X86_ASM_CPU_H_
 
-#define cpu_relax() __asm__ __volatile__("pause"::: "memory")
+#include <stdint.h>
 
-#endif //#endif
+namespace x86::cpu {
+static constexpr uint32_t EFLAGS_IF = 1u << 9;
+}
+
+static inline void cpu_relax() noexcept
+{
+    __asm__ __volatile__("pause" ::: "memory");
+}
+
+static inline void cpu_halt() noexcept
+{
+    __asm__ __volatile__("hlt" ::: "memory");
+}
+
+static inline void irq_disable() noexcept
+{
+    __asm__ __volatile__("cli" ::: "memory");
+}
+
+static inline void irq_enable() noexcept
+{
+  __asm__ __volatile__("sti" ::: "memory");
+}
+
+[[nodiscard]]
+inline bool irq_save_disable() noexcept {
+    uint32_t flags;
+
+    __asm__ __volatile__("pushfl\n\t"
+                         "popl %[flags]\n\t"
+                         "cli"
+                         : [flags] "=r"(flags)
+                         :
+                         : "memory");
+
+    return (flags & x86::cpu::EFLAGS_IF) != 0;
+}
+
+inline void irq_restore(bool was_enabled) noexcept {
+    if (was_enabled) {
+        irq_enable();
+    }
+}
+
+#endif // #endif

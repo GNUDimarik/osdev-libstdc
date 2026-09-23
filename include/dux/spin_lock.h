@@ -58,6 +58,57 @@ __END_STD_NAMESPACE
 namespace dux
 {
 
+class irq_save_guard final
+{
+public:
+    irq_save_guard() noexcept
+        : _M_was_enabled(irq_save_disable())
+    {
+    }
+
+    ~irq_save_guard() noexcept
+    {
+        irq_restore(_M_was_enabled);
+    }
+
+    irq_save_guard(const irq_save_guard &) = delete;
+    irq_save_guard &operator=(const irq_save_guard &) = delete;
+
+    irq_save_guard(irq_save_guard &&) = delete;
+    irq_save_guard &operator=(irq_save_guard &&) = delete;
+
+private:
+    bool _M_was_enabled;
+};
+
+template<typename _Lock>
+class irq_save_lock_guard final
+{
+public:
+    explicit irq_save_lock_guard(_Lock &__lock) noexcept
+        : _M_lock(__lock),
+          _M_was_enabled(irq_save_disable())
+    {
+        _M_lock.lock();
+    }
+
+    ~irq_save_lock_guard() noexcept
+    {
+        _M_lock.unlock();
+        irq_restore(_M_was_enabled);
+    }
+
+    irq_save_lock_guard(const irq_save_lock_guard &) = delete;
+    irq_save_lock_guard &operator=(const irq_save_lock_guard &) = delete;
+
+    irq_save_lock_guard(irq_save_lock_guard &&) = delete;
+    irq_save_lock_guard &operator=(irq_save_lock_guard &&) = delete;
+
+private:
+    _Lock &_M_lock;
+    bool _M_was_enabled;
+};
+
 static constexpr int kFree = 0;
 
 static constexpr int kLocked = 1;

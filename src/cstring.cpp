@@ -162,7 +162,7 @@ char *strncat(char *dest, const char *src, size_t length)
 
 char *strchr(const char *str, int needle)
 {
-    char *s = (char *) str;
+    char *s = const_cast<char*> (str);
 
     do {
         if (*s == static_cast<char> (needle)) {
@@ -186,7 +186,7 @@ char *strrchr(const char *str, int needle)
     }
     while (*s++);
 
-    return (pos == -1 ? nullptr : (char *) str + pos);
+    return (pos == -1 ? nullptr : const_cast<char *>(str + pos));
 }
 
 int strcmp(const char *first, const char *second)
@@ -304,7 +304,7 @@ size_t strcspn(const char *str, const char *reject)
 
 char *strpbrk(const char *str, const char *accept)
 {
-    char *s = (char *) str;
+    char *s = const_cast<char*> (str);
 
     while (*s) {
         if (strchr(accept, *s++) != nullptr) {
