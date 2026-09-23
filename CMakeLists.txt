@@ -56,7 +56,8 @@ if (DEFINED OSDEV_FREESTANDING)
             "${PROJECT_SOURCE_DIR}/include/"
             "${PROJECT_SOURCE_DIR}/include/libstdc"
             "${PROJECT_SOURCE_DIR}/include/posix"
-            "${PROJECT_SOURCE_DIR}/include/arch/${ARCH}")
+            "${PROJECT_SOURCE_DIR}/include/arch/${ARCH}"
+            "${PROJECT_SOURCE_DIR}/../../include")
 
     target_compile_definitions(osdev-libstdc
             PUBLIC
@@ -66,6 +67,7 @@ if (DEFINED OSDEV_FREESTANDING)
             __OSDEV_HAVE_CONFIG_H__=1
             __POSIX_STRINGS_MACRO__
             __OSDEV_DUX_LIBSTDC__
+            BINS_ARE_IN_HEAP
     )
 
     target_compile_options(osdev-libstdc
