@@ -46,13 +46,13 @@ static inline void irq_disable() noexcept
     __asm__ __volatile__("cli" ::: "memory");
 }
 
-static inline void irq_enable() noexcept
+static inline void cpu_irq_enable() noexcept
 {
   __asm__ __volatile__("sti" ::: "memory");
 }
 
 [[nodiscard]]
-inline bool irq_save_disable() noexcept {
+inline bool cpu_irq_save_disable() noexcept {
     uint32_t flags;
 
     __asm__ __volatile__("pushfl\n\t"
@@ -65,9 +65,9 @@ inline bool irq_save_disable() noexcept {
     return (flags & x86::cpu::EFLAGS_IF) != 0;
 }
 
-inline void irq_restore(bool was_enabled) noexcept {
+inline void cpu_irq_restore(bool was_enabled) noexcept {
     if (was_enabled) {
-        irq_enable();
+        cpu_irq_enable();
     }
 }
 

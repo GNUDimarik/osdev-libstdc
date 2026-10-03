@@ -62,13 +62,13 @@ class irq_save_guard final
 {
 public:
     irq_save_guard() noexcept
-        : _M_was_enabled(irq_save_disable())
+        : _M_was_enabled(cpu_irq_save_disable())
     {
     }
 
     ~irq_save_guard() noexcept
     {
-        irq_restore(_M_was_enabled);
+        cpu_irq_restore(_M_was_enabled);
     }
 
     irq_save_guard(const irq_save_guard &) = delete;
@@ -87,7 +87,7 @@ class irq_save_lock_guard final
 public:
     explicit irq_save_lock_guard(_Lock &__lock) noexcept
         : _M_lock(__lock),
-          _M_was_enabled(irq_save_disable())
+          _M_was_enabled(cpu_irq_save_disable())
     {
         _M_lock.lock();
     }
@@ -95,7 +95,7 @@ public:
     ~irq_save_lock_guard() noexcept
     {
         _M_lock.unlock();
-        irq_restore(_M_was_enabled);
+        cpu_irq_restore(_M_was_enabled);
     }
 
     irq_save_lock_guard(const irq_save_lock_guard &) = delete;

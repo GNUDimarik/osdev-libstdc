@@ -1,3 +1,4 @@
 [submodule "malloc"]
 	path = malloc
 	url = git@github.com:GNUDimarik/small_allocator.git
+	branch = dux
