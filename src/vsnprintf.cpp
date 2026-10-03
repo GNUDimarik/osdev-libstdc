@@ -33,7 +33,6 @@
 #define MAX_NUMBER_LEN 66
 
 __MAYBE_BEGIN_STD_NAMESPACE
-__BEGIN_DECLS
 
 static constexpr const char *kNull = "(null)";
 
@@ -49,7 +48,8 @@ enum class LengthSpec: int
     l,
     ll,
     z,
-    t
+    t,
+    ptr
 };
 
 enum FormatFlags: int
@@ -231,9 +231,46 @@ put_with_field_width(char *buf, const char *value, int len, FormatSpec &formatSp
     return buf;
 }
 
+template <typename T, typename U>
+T read_from_va_list(va_list_wrapper &w)
+{
+    if constexpr (__is_same(U, char)) {
+        const int value = va_arg(w.ap, int);
+        return static_cast<T>(static_cast<char>(value));
+    } else if constexpr (__is_same(U, signed char)) {
+        const int value = va_arg(w.ap, int);
+        return static_cast<T>(static_cast<signed char>(value));
+    } else if constexpr (__is_same(U, unsigned char)) {
+        const int value = va_arg(w.ap, int);
+        return static_cast<T>(static_cast<unsigned char>(value));
+    } else if constexpr (__is_same(U, short)) {
+        const int value = va_arg(w.ap, int);
+        return static_cast<T>(static_cast<short>(value));
+    } else if constexpr (__is_same(U, unsigned short)) {
+        const int value = va_arg(w.ap, int);
+        return static_cast<T>(static_cast<unsigned short>(value));
+    } else if constexpr (__is_same(U, void *)) {
+        void *value = va_arg(w.ap, void *);
+        return static_cast<T>(reinterpret_cast<uintptr_t>(value));
+    } else {
+        U value = va_arg(w.ap, U);
+        return static_cast<T>(value);
+    }
+}
+
+template <typename T> unsigned long long read_from_va_list_ull(va_list_wrapper &w)
+{
+    return read_from_va_list<unsigned long long, T>(w);
+}
+
+template <typename T> long long read_from_va_list_ll(va_list_wrapper &w)
+{
+    return read_from_va_list<long long, T>(w);
+}
+
 static char *format_char(char *buf, FormatSpec &formatSpec, int size, va_list_wrapper &w)
 {
-    char c = va_arg(w.ap, int);
+    char c = read_from_va_list<char, char>(w);
     return put_with_field_width(buf, &c, 1, formatSpec, size);
 }
 
@@ -262,30 +299,28 @@ static long long read_signed_number(const FormatSpec &formatSpec, va_list_wrappe
 
     switch (formatSpec.lengthSpec) {
         case LengthSpec::l:
-            value = va_arg(w.ap, long);
+            value = read_from_va_list_ll<long>(w);
             break;
 
         case LengthSpec::z:
-            value = static_cast<int64_t> (va_arg(w.ap, int64_t));
+            value = read_from_va_list_ll<int64_t>(w);
             break;
 
-        case LengthSpec::hh: {
-            char v = va_arg(w.ap, int);
-            value = v;
-        }
-            break;
-
-        case LengthSpec::h:
-            value = va_arg(w.ap, int);
+        case LengthSpec::hh:
+            value = read_from_va_list_ll<signed char>(w);;
             break;
 
         case LengthSpec::t:
-            value = va_arg(w.ap, ptrdiff_t);
+            value = read_from_va_list_ll<ptrdiff_t>(w);
+            break;
+
+        case LengthSpec::h:
+            value = read_from_va_list_ll<int>(w);
             break;
 
         case LengthSpec::ll:
         default:
-            value = va_arg(w.ap, long long);
+            value = read_from_va_list_ll<long long>(w);
             break;
     }
 
@@ -298,26 +333,28 @@ static unsigned long long read_unsigned_number(const FormatSpec &formatSpec, va_
 
     switch (formatSpec.lengthSpec) {
         case LengthSpec::l:
-            value = va_arg(w.ap, unsigned long);
+            value = read_from_va_list_ull<unsigned long>(w);
             break;
 
         case LengthSpec::z:
-            value = static_cast<size_t> (va_arg(w.ap, size_t));
+            value = read_from_va_list_ull<size_t>(w);
             break;
 
-        case LengthSpec::hh: {
-            unsigned char v = va_arg(w.ap, unsigned int);
-            value = v;
-        }
+        case LengthSpec::ptr:
+            value = read_from_va_list_ull<void*>(w);
+            break;
+
+        case LengthSpec::hh:
+            value = read_from_va_list_ull<unsigned char>(w);
             break;
 
         case LengthSpec::h:
-            value = va_arg(w.ap, unsigned int);
+            value = read_from_va_list_ull<unsigned int>(w);
             break;
 
         case LengthSpec::ll:
         default:
-            value = va_arg(w.ap, unsigned long long);
+            value = read_from_va_list_ull<unsigned long long>(w);
             break;
     }
 
@@ -448,6 +485,8 @@ static char *read_format_unsigned_int(char *buf, FormatSpec &formatSpec, int siz
     return format_number(buf, value, formatSpec, size);
 }
 
+__BEGIN_DECLS
+
 int vsnprintf(char *buf, size_t max_size, const char *fmt, va_list ap)
 {
     FormatSpec formatSpec;
@@ -532,6 +571,7 @@ int vsnprintf(char *buf, size_t max_size, const char *fmt, va_list ap)
                     break;
 
                 case 'p': {
+                    formatSpec.lengthSpec = LengthSpec::ptr;
                     auto value = read_unsigned_number(formatSpec, wrapper);
 
                     if (value > 0) {
