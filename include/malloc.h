@@ -36,6 +36,7 @@ __BEGIN_DECLS
 #endif
 
 int libstdc_allocator_initialize(void* base, size_t size);
+void libstdc_dump_memory();
 void *aligned_alloc(size_t alignment, size_t size);
 void *calloc(size_t num, size_t size);
 void free(void *ptr);

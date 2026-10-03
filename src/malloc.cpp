@@ -45,6 +45,12 @@ int libstdc_allocator_initialize(void* base, size_t size)
    return mem_initialize(base, size);
 }
 
+void libstdc_dump_memory()
+{
+    __lock_guard g(gLock);
+    mem_dump();
+}
+
 void *aligned_alloc(size_t alignment, size_t size)
 {
     __lock_guard g(gLock);
